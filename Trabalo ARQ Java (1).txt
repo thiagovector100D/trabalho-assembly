@@ -1,0 +1,56 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package javaapplication40;
+
+import java.util.Scanner;
+
+/
+ *
+ * @author thiag
+ */
+public class JavaApplication40 {
+
+    /
+     * @param args the command line arguments
+     */
+
+    public static void main(String[] args) {
+
+        double sol=1, chuva=1 ;
+        double taxa= 0.3, limite= 0.0;
+        int i;
+        double respostas,respostas1, Z,relu;
+
+        Scanner ent = new Scanner (System.in);
+
+        System.out.println("Olá, você poderia nos ajudar em uma pesquisa?\nEstamos a calcular a chance de uma pessoa frequentar o cinema em um dia normal, perguntaremos questões sobre o clima e assim calcularemos a chance de você ir ao cinema:");
+
+        for(i=0;i<10;i++){
+
+           System.out.println("Digite de 0.000 à 1.000 referente a chance de chuva em sua cidade: ");
+           respostas= ent.nextDouble();
+
+           System.out.println("Digite de 0.000 à 1.000 referente a chance de sol em sua cidade: ");
+           respostas1= ent.nextDouble();
+
+
+           Z = -(respostas*chuva)+(respostas1*sol);
+
+           if(Z>taxa){
+             System.out.println("Vc vai");
+           }
+           else{
+             System.out.println("Vc não vai");
+
+             if(taxa>limite){
+
+               taxa= taxa - 0.05;
+             }
+           }
+
+        }
+     } 
+    }

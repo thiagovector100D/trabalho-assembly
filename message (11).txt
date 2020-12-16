@@ -1,0 +1,118 @@
+.data
+
+enunciado:             .asciiz "Olá, você poderia nos ajudar em uma pesquisa?\nEstamos a calcular a chance de uma pessoa frequentar o cinema em um dia normal, perguntaremos questões sobre o clima e assim calcularemos a chance de você ir ao cinema:"
+enunciadoChuva:        .asciiz "\nDigite de 0.000 à 1.000 referente a chance de chuva em sua cidade:"
+enunciadoSol:          .asciiz "\nDigite de 0.000 à 1.000 referente a chance de sol em sua cidade:"
+
+chuva:                 .float 1.0
+sol:                   .float 1.0
+
+respostasaidapos:      .asciiz "\nVocê irá ao cinema"
+respostasaidaneg:      .asciiz "\nVocê não irá ao cinema"
+
+negativo:              .float -1.0
+
+respostasol:           .float 0.0
+respostachuva:          .float 0.0
+
+taxa:                  .float 0.3
+limite:                .float 0.0
+diminuir:              .float 0.2
+tanto:                 .float 0.0
+five:                  .float 5.0
+
+.text
+
+#Enviando mensagem do enunciado ao usuario
+
+main:     li $v0,4
+              la $a0, enunciado
+              syscall
+
+       
+       lwc1 $f1,sol
+       lwc1 $f2,chuva
+       lwc1 $f3,taxa
+       lwc1 $f4,diminuir
+       lwc1 $f20,tanto
+
+      addi  $t0,$t0,0
+#Efetuando o for 
+
+for: slti  $t1,$t0,3
+      beq  $t1,$zero, fim
+ 
+       #Enviando ao usuario as perguntas referente a CHUVA E SOL e armazenando as mesmas nas variaveis respostachuva e respostasol.    
+       li $v0,4
+              la $a0, enunciadoChuva
+              syscall
+
+       li $v0, 6
+	syscall
+       
+       lwc1  $f5, respostachuva
+       add.s  $f5,$f5,$f0
+       
+
+       li $v0,4
+              la $a0, enunciadoSol
+              syscall
+ 
+	li $v0, 6
+	syscall
+       
+      lwc1  $f6, respostasol 
+      add.s  $f6,$f6,$f0
+        
+ #Carregando os valores da respostas de sol e chuva para os registradores $s2 e $s3
+ 
+       lwc1 $f30,negativo,($zero)
+       
+       
+     mul.s $f10,$f5,$f2
+     mul.s $f11,$f6,$f1
+     mul.s $f13,$f30,$f10
+     add.s $f14,$f13,$f11  #resposta do Z
+
+     add.s   $f12,$f14,$f0
+
+          li $v0,2
+          syscall 
+
+     add.s   $f14,$f12,$f0     
+
+     #nessa parte viria 2 estruturas condicionais, BGT (SE A RESPOSTA DE Z fosse > taxa) que fazeria saltar para IF e BLT (SE A RESPOSTA DE Z fosse < taxa) que fazeria saltar para IF2.
+     c.lt.s $f14, $f3
+     bc1t 1, label
+     
+     c.lt.s $f14, $f3
+     bc1t label2
+     
+label:      
+        li $v0,4
+              la $a0, respostasaidapos
+              syscall
+              
+      addi $t0,$t0,1
+        j for
+        
+     
+      
+label2:    
+        li $v0,4
+              la $a0, respostasaidaneg
+              syscall
+
+       lwc1 $f25,limite
+       
+        c.lt.s $f3,$f25
+        bc1t else
+        addi $t0,$t0,1
+        j for
+         
+else:
+        sub.s  $f3,$f3,$f4   
+        addi $t0,$t0,1
+         j for
+
+fim :   jr $ra   
